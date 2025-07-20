@@ -1,5 +1,6 @@
 import os
 import sys
+from google.genai import types
 from dotenv import load_dotenv
 from google import genai
 
@@ -15,14 +16,26 @@ def main():
         print("Please enter a promt")
         sys.exit(1)
 
+    messages = [
+        types.Content(role="user", parts=[types.Part(text=prompt)]),
+    ]
+
     response = client.models.generate_content(
         model='gemini-2.0-flash-001',
-        contents=prompt
+        contents=messages
     )
 
     print(response.text)
-    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    try:
+        if (sys.argv[2] == "--verbose"):
+
+            print(f"User prompt: {prompt}")
+            print(f"Prompt tokens: {
+                  response.usage_metadata.prompt_token_count}")
+            print(f"Response tokens: {
+                  response.usage_metadata.candidates_token_count}")
+    finally:
+        sys.exit(0)
 
 
 if __name__ == "__main__":
